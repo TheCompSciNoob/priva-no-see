@@ -1,8 +1,7 @@
 #include <Adafruit_CircuitPlayground.h>
+#include <SensorTests.h>
 
 #define TAP_THRESHOLD 10
-
-static float mX, mY, mZ;
 
 void onSingleTap();
 

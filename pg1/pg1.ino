@@ -1,5 +1,5 @@
 #include <Adafruit_CircuitPlayground.h>
-#include "../SensorTests.h"
+#include <SensorTests.h>
 
 static void setup() {
     Serial.begin(9600);
