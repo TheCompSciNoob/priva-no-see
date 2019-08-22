@@ -1,5 +1,4 @@
 #include <Adafruit_CircuitPlayground.h>
-#include <SensorTests.h>
 
 #define TAP_THRESHOLD 20
 
