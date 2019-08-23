@@ -39,8 +39,6 @@ void loop()
     {
         calibrateLightThreshold();
     }
-
-    delay(1000); //runs every second
 }
 
 void calibrateDarkThreshold()
