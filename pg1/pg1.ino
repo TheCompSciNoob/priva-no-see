@@ -1,16 +1,21 @@
 #include <Adafruit_CircuitPlayground.h>
+#include <Servo.h>
 
 #define MAX_BRIGHT 1023
 #define MIN_BRIGHT 0
+#define SERVO_SPEED 270
+#define SERVO_NO_MOTION 90
 
 static bool isClosed = false;
 static int lightThreshold = MAX_BRIGHT;
 static int darkThreshold = MIN_BRIGHT;
+static Servo servo;
 
 void setup()
 {
-    Serial.begin(9600);
+    servo.attach(10);
     CircuitPlayground.begin();
+    Serial.begin(9600);
 }
 
 void loop()
@@ -39,6 +44,10 @@ void loop()
     {
         calibrateLightThreshold();
     }
+
+
+    //run every second
+    delay(1000);
 }
 
 void calibrateDarkThreshold()
@@ -64,6 +73,8 @@ void openBlinds()
         return;
     }
     isClosed = false;
+    //testing
+    servo.write(SERVO_NO_MOTION + SERVO_SPEED);
     //TODO
 }
 
@@ -74,6 +85,10 @@ void closeBlinds()
         return;
     }
     isClosed = true;
+    //testing
+    servo.write(SERVO_NO_MOTION - SERVO_SPEED);
+    delay(5000);
+    servo.write(SERVO_NO_MOTION);
     //TODO
 }
 
