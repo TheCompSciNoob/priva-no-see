@@ -3,18 +3,18 @@
 #define MILLIS_PER_MIN 60000L
 #define LEFT_NEOS 1001
 #define RIGHT_NEOS 1002
-#define YELLOW_HEX 0xffff00
+#define WHITE_HEX 0xffffff
 #define BLINK_DELAY 150
 #define BUTTON_LEFT 4
 #define BUTTON_RIGHT 19
 
-_Bool isLongPressLeft();
-_Bool isLongPressRight();
+bool isLongPressLeft();
+bool isLongPressRight();
 void blinkNeosThrice(int neos[], int size, int hex);
 void calibrateDarkThreshold(int *darkThreshold);
 void calibrateLightThreshold(int *lightThreshold);
 void resetManualOverrideTimer(long *manualOverrideMillis);
-void calibrateManualOverrideTimer(long *manualOverrideMillis, _Bool isLongPress(void));
+void calibrateManualOverrideTimer(long *manualOverrideMillis, bool isLongPress(void));
 long getRainbowColor(int i, int size);
 
 void calibrate(int *darkThreshold, int *lightThreshold, long *manualOverrideMillis)
@@ -43,7 +43,7 @@ void calibrate(int *darkThreshold, int *lightThreshold, long *manualOverrideMill
     }
 }
 
-_Bool isLongPressLeft()
+bool isLongPressLeft()
 {
     if (!CircuitPlayground.leftButton())
     {
@@ -53,7 +53,7 @@ _Bool isLongPressLeft()
     return CircuitPlayground.leftButton();
 }
 
-_Bool isLongPressRight()
+bool isLongPressRight()
 {
     if (!CircuitPlayground.rightButton())
     {
@@ -70,7 +70,7 @@ void calibrateDarkThreshold(int *darkThreshold)
     Serial.println(*darkThreshold);
     const int size = 5;
     int neos[] = {0, 1, 2, 3, 4};
-    blinkNeosThrice(neos, size, YELLOW_HEX);
+    blinkNeosThrice(neos, size, WHITE_HEX);
 }
 
 void calibrateLightThreshold(int *lightThreshold)
@@ -80,7 +80,7 @@ void calibrateLightThreshold(int *lightThreshold)
     Serial.println(*lightThreshold);
     const int size = 5;
     int neos[] = {5, 6, 7, 8, 9};
-    blinkNeosThrice(neos, size, YELLOW_HEX);
+    blinkNeosThrice(neos, size, WHITE_HEX);
 }
 
 void blinkNeosThrice(int neos[], int size, int hex)
@@ -114,7 +114,7 @@ void resetManualOverrideTimer(long *manualOverrideMillis)
     }
 }
 
-void calibrateManualOverrideTimer(long *manualOverrideMillis, _Bool isLongPress(void))
+void calibrateManualOverrideTimer(long *manualOverrideMillis, bool isLongPress(void))
 {
     Serial.println("Calibrating manual override timer...");
     const int size = 10;
