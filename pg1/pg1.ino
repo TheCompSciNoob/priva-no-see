@@ -1,19 +1,28 @@
 #include <Adafruit_CircuitPlayground.h>
-#include <Servo.h>
 
 #define MAX_BRIGHT 1023
 #define MIN_BRIGHT 0
-#define SERVO_SPEED 270
-#define SERVO_NO_MOTION 90
+#define MILLIS_PER_MIN 60000
+#define LEFT_NEOS 1001
+#define RIGHT_NEOS 1002
+#define YELLOW_R 255
+#define YELLOW_G 255
+#define YELLOW_B 0
 
+//control blinds
 static bool isClosed = false;
 static int lightThreshold = MAX_BRIGHT;
 static int darkThreshold = MIN_BRIGHT;
-static Servo servo;
+
+//manual override with clapping
+static long baseTime = 0;
+static int manualOverrideMillis = 0;
+
+_Bool isLongPressLeft();
+_Bool isLongPressRight();
 
 void setup()
 {
-    servo.attach(10);
     CircuitPlayground.begin();
     Serial.begin(9600);
 }
@@ -35,19 +44,57 @@ void loop()
         closeBlinds();
     }
 
-    //use buttons to calibrate brightness
-    if (CircuitPlayground.leftButton())
-    {
-        calibrateDarkThreshold();
-    }
-    else if (CircuitPlayground.rightButton())
-    {
-        calibrateLightThreshold();
-    }
-
+    //check for calibration inputs
+    checkForCalibration();
 
     //run every second
     delay(1000);
+}
+
+void checkForCalibration()
+{
+    if (CircuitPlayground.slideSwitch()) //slide switch left
+    {
+        if (isLongPressLeft())
+        {
+            calibrateDarkThreshold();
+        }
+        if (isLongPressRight())
+        {
+            calibrateLightThreshold();
+        }
+    }
+    else
+    {
+        if (isLongPressLeft())
+        {
+            //TODO
+        }
+        if (isLongPressRight())
+        {
+            //TODO
+        }
+    }
+}
+
+_Bool isLongPressLeft()
+{
+    if (!CircuitPlayground.leftButton())
+    {
+        return false;
+    }
+    delay(1000);
+    return CircuitPlayground.leftButton();
+}
+
+_Bool isLongPressRight()
+{
+    if (!CircuitPlayground.rightButton())
+    {
+        return false;
+    }
+    delay(1000);
+    return CircuitPlayground.rightButton();
 }
 
 void calibrateDarkThreshold()
@@ -55,7 +102,7 @@ void calibrateDarkThreshold()
     darkThreshold = CircuitPlayground.lightSensor();
     Serial.print("Dark threshold set to: ");
     Serial.println(darkThreshold);
-    blinkRedLedThrice();
+    blinkNeos(LEFT_NEOS, YELLOW_R, YELLOW_G, YELLOW_B);
 }
 
 void calibrateLightThreshold()
@@ -63,7 +110,7 @@ void calibrateLightThreshold()
     lightThreshold = CircuitPlayground.lightSensor();
     Serial.print("Light threshold set to: ");
     Serial.println(lightThreshold);
-    blinkRedLedThrice();
+    blinkNeos(RIGHT_NEOS, YELLOW_R, YELLOW_G, YELLOW_B);
 }
 
 void openBlinds()
@@ -73,8 +120,6 @@ void openBlinds()
         return;
     }
     isClosed = false;
-    //testing
-    servo.write(SERVO_NO_MOTION + SERVO_SPEED);
     //TODO
 }
 
@@ -85,10 +130,6 @@ void closeBlinds()
         return;
     }
     isClosed = true;
-    //testing
-    servo.write(SERVO_NO_MOTION - SERVO_SPEED);
-    delay(5000);
-    servo.write(SERVO_NO_MOTION);
     //TODO
 }
 
@@ -104,15 +145,36 @@ void toggleBlinds()
     }
 }
 
-void blinkRedLedThrice()
+void blinkNeos(int side, int red, int green, int blue)
 {
-    CircuitPlayground.redLED(false);
-    delay(1000);
-    for (int i = 0; i < 3; i++)
+    //neos to blink
+    int NUM_NEOS = 5;
+    if (side == LEFT_NEOS)
     {
-        CircuitPlayground.redLED(true);
-        delay(200);
-        CircuitPlayground.redLED(false);
-        delay(200);
+        int neosLeft[] = {0, 1, 2, 3, 4};
+        blinkNeosThrice(neosLeft, NUM_NEOS, red, green, blue);
+    }
+    else if (side == RIGHT_NEOS)
+    {
+        int neosRight[] = {5, 6, 7, 8, 9};
+        blinkNeosThrice(neosRight, NUM_NEOS, red, green, blue);
+    }
+    else
+    {
+        Serial.println("Invalid side argument for NEOs.");
+    }
+}
+
+void blinkNeosThrice(int neos[], int size, int red, int green, int blue)
+{
+    for (int timesBlinked = 0; timesBlinked < 3; timesBlinked++)
+    {
+        for (int neoIndex = 0; neoIndex < size; neoIndex++)
+        {
+            CircuitPlayground.setPixelColor(neos[neoIndex], red, green, blue);
+        }
+        delay(100);
+        CircuitPlayground.clearPixels();
+        delay(100);
     }
 }
