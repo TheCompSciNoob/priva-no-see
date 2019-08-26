@@ -8,14 +8,17 @@
 
 bool isLongPressLeft();
 bool isLongPressRight();
-void blinkNeosThrice(int neos[], int size, int hex);
+void blinkNeos(int neos[], int times, int size, int hex);
 void blinkRainbow(int times);
+void startTimerMode(struct BlindsState *state);
+void startContinuousOverrideMode(struct BlindsState *state);
 void calibrateDarkThreshold(struct BlindsState *state);
 void calibrateLightThreshold(struct BlindsState *state);
 void resetManualOverrideTimer(struct BlindsState *state);
 void calibrateManualOverrideTimer(struct BlindsState *state, bool isLongPress(void));
 long getRainbowColor(int i, int size);
 
+//checks slide switch and button inputs for calibration
 void calibrate(struct BlindsState *state)
 {
     if (CircuitPlayground.slideSwitch()) //slide switch left
@@ -39,27 +42,9 @@ void calibrate(struct BlindsState *state)
             Serial.print("Timer mode set to: ");
             Serial.println((*state).isTimerOn);
             if ((*state).isTimerOn)
-            {
-                (*state).isContinuousOverrideOn = false;
-                //indicate timer mode with rainbow colors
-                const int size = 10;
-                for (int neoIndex = 0; neoIndex < size; neoIndex++)
-                    CircuitPlayground.setPixelColor(neoIndex, getRainbowColor(neoIndex, size));
-                while (isLongPressLeft())
-                    ; //just wait
-                CircuitPlayground.clearPixels();
-            }
+                startTimerMode(state);
             else
-            {
-                (*state).timerMillis = 0;
-                //indicate continuous override mode with all white LEDs
-                const int size = 10;
-                for (int neoIndex = 0; neoIndex < size; neoIndex++)
-                    CircuitPlayground.setPixelColor(neoIndex, WHITE_HEX);
-                while (isLongPressLeft())
-                    ; //just wait
-                CircuitPlayground.clearPixels();
-            }
+                startContinuousOverrideMode(state);
         }
         if (isLongPressRight())
         {
@@ -74,13 +59,40 @@ void calibrate(struct BlindsState *state)
                 static int neos[] = {2};
                 while (isLongPressRight())
                 {
-                    blinkNeosThrice(neos, size, WHITE_HEX);
+                    blinkNeos(neos, 3, size, WHITE_HEX);
                 }
             }
         }
     }
 }
 
+//switches to timer mode and resets continuous override mode
+void startTimerMode(struct BlindsState *state)
+{
+    (*state).isContinuousOverrideOn = false;
+    //indicate timer mode with rainbow colors
+    const int size = 10;
+    for (int neoIndex = 0; neoIndex < size; neoIndex++)
+        CircuitPlayground.setPixelColor(neoIndex, getRainbowColor(neoIndex, size));
+    while (isLongPressLeft())
+        ; //just wait
+    CircuitPlayground.clearPixels();
+}
+
+//switches to continuous override mode and resets timer mode
+void startContinuousOverrideMode(struct BlindsState *state)
+{
+    (*state).timerMillis = 0;
+    //indicate continuous override mode with all white LEDs
+    const int size = 10;
+    for (int neoIndex = 0; neoIndex < size; neoIndex++)
+        CircuitPlayground.setPixelColor(neoIndex, WHITE_HEX);
+    while (isLongPressLeft())
+        ; //just wait
+    CircuitPlayground.clearPixels();
+}
+
+//detect for left button long press
 bool isLongPressLeft()
 {
     if (!CircuitPlayground.leftButton())
@@ -89,6 +101,7 @@ bool isLongPressLeft()
     return CircuitPlayground.leftButton();
 }
 
+//detect for right button long press
 bool isLongPressRight()
 {
     if (!CircuitPlayground.rightButton())
@@ -97,6 +110,7 @@ bool isLongPressRight()
     return CircuitPlayground.rightButton();
 }
 
+//sets darkThreshold in BlindsState with button input
 void calibrateDarkThreshold(struct BlindsState *state)
 {
     (*state).darkThreshold = CircuitPlayground.lightSensor();
@@ -104,9 +118,10 @@ void calibrateDarkThreshold(struct BlindsState *state)
     Serial.println((*state).darkThreshold);
     const int size = 5;
     int neos[] = {0, 1, 2, 3, 4};
-    blinkNeosThrice(neos, size, WHITE_HEX);
+    blinkNeos(neos, 3, size, WHITE_HEX);
 }
 
+//sets lightThreshold in BlindsState with button input
 void calibrateLightThreshold(struct BlindsState *state)
 {
     (*state).lightThreshold = CircuitPlayground.lightSensor();
@@ -114,9 +129,10 @@ void calibrateLightThreshold(struct BlindsState *state)
     Serial.println((*state).lightThreshold);
     const int size = 5;
     int neos[] = {5, 6, 7, 8, 9};
-    blinkNeosThrice(neos, size, WHITE_HEX);
+    blinkNeos(neos, 3, size, WHITE_HEX);
 }
 
+//resets timer to 0
 void resetManualOverrideTimer(struct BlindsState *state)
 {
     (*state).timerMillis = 0L;
@@ -124,6 +140,7 @@ void resetManualOverrideTimer(struct BlindsState *state)
     blinkRainbow(2);
 }
 
+//calibrate timer with button input
 void calibrateManualOverrideTimer(struct BlindsState *state, bool isLongPress(void))
 {
     Serial.println("Calibrating manual override timer...");
@@ -145,9 +162,9 @@ void calibrateManualOverrideTimer(struct BlindsState *state, bool isLongPress(vo
     Serial.println(" minutes.");
 }
 
-void blinkNeosThrice(int neos[], int size, int hex)
+void blinkNeos(int neos[], int times, int size, int hex)
 {
-    for (int timesBlinked = 0; timesBlinked < 3; timesBlinked++)
+    for (int timesBlinked = 0; timesBlinked < times; timesBlinked++)
     {
         for (int neoIndex = 0; neoIndex < size; neoIndex++)
         {

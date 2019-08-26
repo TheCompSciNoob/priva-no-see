@@ -31,13 +31,15 @@ void loop()
     //controller
     operateBlinds(&state);
 
-    checkSerialInputs(&state);
+    //check computer inputs for debugging
+    processSerialInputs(&state);
 
     //run every second
     delay(1000);
 }
 
-void checkSerialInputs(struct BlindsState *state)
+//send inputs from computer
+void processSerialInputs(struct BlindsState *state)
 {
     char input = Serial.read();
     if (input == 'o')

@@ -13,6 +13,8 @@ void timerOverrideBlinds(struct BlindsState *state);
 void overrideBlinds(struct BlindsState *state);
 bool isBright(struct BlindsState *state);
 
+//blinds controller decides what mode to operate in
+//determines if the blinds should open/close based on the BlindsState
 void operateBlinds(struct BlindsState *state)
 {
     if ((*state).isTimerOn)
@@ -21,12 +23,14 @@ void operateBlinds(struct BlindsState *state)
         operateContinuousOverrideMode(state);
 }
 
+//blinds controller in timer mode
 void operateTimerMode(struct BlindsState *state)
 {
     if (millis() - (*state).lastOverrideMillis > (*state).timerMillis)
         defaultOperateBlinds(state); //stop override when time is up
 }
 
+//blinds controller in continuous override mode
 void operateContinuousOverrideMode(struct BlindsState *state)
 {
     if ((*state).lastLightState != isBright(state)) //change in light state
@@ -40,6 +44,7 @@ void operateContinuousOverrideMode(struct BlindsState *state)
     }
 }
 
+//open or close blinds based on brightness (default behavior)
 void defaultOperateBlinds(struct BlindsState *state)
 {
     if (isBright(state))
@@ -48,6 +53,7 @@ void defaultOperateBlinds(struct BlindsState *state)
         closeBlinds(state);
 }
 
+//force open or close blinds (overrides default behavior)
 void forceToggleBlinds(struct BlindsState *state)
 {
     if ((*state).isClosed)
@@ -74,18 +80,21 @@ void closeBlinds(struct BlindsState *state)
     //TODO
 }
 
+//override blinds in continuous override mode
 void continuousOverrideBlinds(struct BlindsState *state)
 {
     (*state).isContinuousOverrideOn = true;
     forceToggleBlinds(state);
 }
 
+//override blinds in timer mode
 void timerOverrideBlinds(struct BlindsState *state)
 {
     (*state).lastOverrideMillis = millis();
     forceToggleBlinds(state);
 }
 
+//override blinds based on the current mode
 void overrideBlinds(struct BlindsState *state)
 {
     if ((*state).isTimerOn)
@@ -94,6 +103,7 @@ void overrideBlinds(struct BlindsState *state)
         continuousOverrideBlinds(state);
 }
 
+//determines whether it is light or dark
 bool isBright(struct BlindsState *state)
 {
     return CircuitPlayground.lightSensor() > ((*state).lightThreshold + (*state).darkThreshold) / 2;

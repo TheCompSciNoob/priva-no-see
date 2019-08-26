@@ -6,11 +6,14 @@
 
 struct BlindsState
 {
+    //timer mode
     bool isTimerOn;
     long lastOverrideMillis;
     long timerMillis;
+    //continuous override mode
     bool isContinuousOverrideOn;
     bool lastLightState;
+    //configuration
     bool isClosed;
     int lightThreshold;
     int darkThreshold;
