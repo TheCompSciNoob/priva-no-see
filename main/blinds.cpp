@@ -83,6 +83,7 @@ void closeBlinds(struct BlindsState *state)
 //override blinds in continuous override mode
 void continuousOverrideBlinds(struct BlindsState *state)
 {
+    Serial.println("Start continuous override blinds.");
     (*state).isContinuousOverrideOn = true;
     forceToggleBlinds(state);
 }
@@ -90,6 +91,7 @@ void continuousOverrideBlinds(struct BlindsState *state)
 //override blinds in timer mode
 void timerOverrideBlinds(struct BlindsState *state)
 {
+    Serial.println("Start timer override blinds.");
     (*state).lastOverrideMillis = millis();
     forceToggleBlinds(state);
 }
