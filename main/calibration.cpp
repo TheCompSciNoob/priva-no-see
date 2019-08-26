@@ -1,4 +1,5 @@
 #include <Adafruit_CircuitPlayground.h>
+#include "calibration.h"
 
 #define MILLIS_PER_MIN 60000L
 #define LEFT_NEOS 1001
@@ -11,34 +12,70 @@
 bool isLongPressLeft();
 bool isLongPressRight();
 void blinkNeosThrice(int neos[], int size, int hex);
+void blinkRainbow();
 void calibrateDarkThreshold(int *darkThreshold);
 void calibrateLightThreshold(int *lightThreshold);
-void resetManualOverrideTimer(long *manualOverrideMillis);
-void calibrateManualOverrideTimer(long *manualOverrideMillis, bool isLongPress(void));
+void resetManualOverrideTimer(long *timerMillis);
+void calibrateManualOverrideTimer(long *timerMillis, bool isLongPress(void));
 long getRainbowColor(int i, int size);
 
-void calibrate(int *darkThreshold, int *lightThreshold, long *manualOverrideMillis)
+void calibrate(
+    int *darkThreshold,
+    int *lightThreshold,
+    bool isBright(void),
+    bool *isTimerOn,
+    int *continuousOverrideState,
+    long *timerMillis)
 {
     if (CircuitPlayground.slideSwitch()) //slide switch left
     {
         if (isLongPressLeft())
         {
             calibrateDarkThreshold(darkThreshold);
+            *continuousOverrideState = OVERRIDE_NONE;
         }
         if (isLongPressRight())
         {
             calibrateLightThreshold(lightThreshold);
+            *continuousOverrideState = OVERRIDE_NONE;
         }
     }
     else
     {
         if (isLongPressLeft())
         {
-            resetManualOverrideTimer(manualOverrideMillis);
+            *isTimerOn = !*isTimerOn;
+            Serial.print("Timer mode set to: ");
+            Serial.println(*isTimerOn);
+            if (*isTimerOn)
+            {
+                continuousOverrideState = OVERRIDE_NONE;
+                blinkRainbow();
+            }
+            else
+            {
+                *timerMillis = 0;
+                const int size = 10;
+                int neos[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+                blinkNeosThrice(neos, size, WHITE_HEX);
+            }
         }
         if (isLongPressRight())
         {
-            calibrateManualOverrideTimer(manualOverrideMillis, isLongPressRight);
+            if (*isTimerOn)
+            {
+                resetManualOverrideTimer(timerMillis);
+                calibrateManualOverrideTimer(timerMillis, isLongPressRight);
+            }
+            else //do not allow timer calibration if timer is off
+            {
+                const int size = 1;
+                static int neos[] = {2};
+                while (isLongPressRight())
+                {
+                    blinkNeosThrice(neos, size, WHITE_HEX);
+                }
+            }
         }
     }
 }
@@ -97,10 +134,8 @@ void blinkNeosThrice(int neos[], int size, int hex)
     }
 }
 
-void resetManualOverrideTimer(long *manualOverrideMillis)
+void blinkRainbow()
 {
-    *manualOverrideMillis = 0L;
-    Serial.println("Manual override timer reset.");
     const int size = 10;
     for (int timesBlinked = 0; timesBlinked < 3; timesBlinked++)
     {
@@ -114,24 +149,31 @@ void resetManualOverrideTimer(long *manualOverrideMillis)
     }
 }
 
-void calibrateManualOverrideTimer(long *manualOverrideMillis, bool isLongPress(void))
+void resetManualOverrideTimer(long *timerMillis)
+{
+    *timerMillis = 0L;
+    Serial.println("Manual override timer reset.");
+    blinkRainbow();
+}
+
+void calibrateManualOverrideTimer(long *timerMillis, bool isLongPress(void))
 {
     Serial.println("Calibrating manual override timer...");
     const int size = 10;
     while (isLongPress())
     {
-        int neoIndex = *manualOverrideMillis / MILLIS_PER_MIN % size;
+        int neoIndex = *timerMillis / MILLIS_PER_MIN % size;
         if (neoIndex == 0)
         {
             CircuitPlayground.clearPixels();
         }
         CircuitPlayground.setPixelColor(neoIndex, getRainbowColor(neoIndex, size));
-        *manualOverrideMillis += MILLIS_PER_MIN;
+        *timerMillis += MILLIS_PER_MIN;
     }
     delay(1000);
     CircuitPlayground.clearPixels();
     Serial.print("Calibrate manual override timer complete:　");
-    Serial.print(*manualOverrideMillis / MILLIS_PER_MIN);
+    Serial.print(*timerMillis / MILLIS_PER_MIN);
     Serial.println(" minutes.");
 }
 

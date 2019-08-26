@@ -1,6 +1,16 @@
 #ifndef CALIBRATION_H
 #define CALIBRATION_H
 
-void calibrate(int *darkThreshold, int *lightThreshold, long *manualOverrideMillis);
+static const int OVERRIDE_NONE = 0;
+static const int OVERRIDE_LIGHT = 1;
+static const int OVERRIDE_DARK = 2;
 
-#endif //EC_HW3B_SOMETHING_COMPICATED_H
+void calibrate(
+    int *darkThreshold,
+    int *lightThreshold,
+    bool isBright(void),
+    bool *isTimerOn,
+    int *manualOverrideMode,
+    long *timerMillis);
+
+#endif

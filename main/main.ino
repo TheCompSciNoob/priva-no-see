@@ -10,8 +10,10 @@ static int lightThreshold = MAX_BRIGHT;
 static int darkThreshold = MIN_BRIGHT;
 
 //manual override with clapping
-static long baseTime = 0;
-static long manualOverrideMillis = 0;
+static bool isTimerOn = false;
+static long lastOverrideMillis = 0;
+static long timerMillis = 0;
+static int continuousOverrideState = OVERRIDE_NONE;
 
 _Bool isLongPressLeft();
 _Bool isLongPressRight();
@@ -20,34 +22,65 @@ void setup()
 {
     CircuitPlayground.begin();
     Serial.begin(9600);
+    lastOverrideMillis = millis();
 }
 
 void loop()
 {
-    //open or close blinds based on brightness
     int brightness = CircuitPlayground.lightSensor();
     Serial.print("Brightness: "); //log sensor
     Serial.println(brightness);
-    if (brightness > (lightThreshold + darkThreshold) / 2) //theshold is average brightness
+
+    if (isTimerOn)
     {
-        CircuitPlayground.redLED(true);
-        openBlinds();
+        if (millis() - lastOverrideMillis > timerMillis)
+        {
+            defaultToggleBlinds();
+        }
     }
     else
     {
-        CircuitPlayground.redLED(false);
-        closeBlinds();
+        //reset override when light state changes
+        if (continuousOverrideState == OVERRIDE_DARK && isBright())
+        {
+            continuousOverrideState = OVERRIDE_NONE;
+        }
+        else if (continuousOverrideState == OVERRIDE_LIGHT && !isBright())
+        {
+            continuousOverrideState = OVERRIDE_NONE;
+        }
+
+        //open or close blinds when manual override is off
+        if (continuousOverrideState == OVERRIDE_NONE)
+        {
+            defaultToggleBlinds();
+        }
     }
 
     //check for calibration inputs
-    calibrate(&darkThreshold, &lightThreshold, &manualOverrideMillis);
+    calibrate(
+        &darkThreshold,
+        &lightThreshold,
+        isBright,
+        &isTimerOn,
+        &continuousOverrideState,
+        &timerMillis);
+
+    //check for serial inputs
+    checkSerialInputs();
 
     //run every second
     delay(1000);
 }
 
+bool isBright()
+{
+    return CircuitPlayground.lightSensor() > (lightThreshold + darkThreshold) / 2;
+}
+
 void openBlinds()
 {
+    CircuitPlayground.redLED(true);
     if (!isClosed)
     {
         return;
@@ -58,6 +91,7 @@ void openBlinds()
 
 void closeBlinds()
 {
+    CircuitPlayground.redLED(false);
     if (isClosed)
     {
         return;
@@ -66,7 +100,19 @@ void closeBlinds()
     //TODO
 }
 
-void toggleBlinds()
+void defaultToggleBlinds()
+{
+    if (isBright())
+    {
+        openBlinds();
+    }
+    else
+    {
+        closeBlinds();
+    }
+}
+
+void forceToggleBlinds()
 {
     if (isClosed)
     {
@@ -75,5 +121,40 @@ void toggleBlinds()
     else
     {
         closeBlinds();
+    }
+}
+
+void continuousOverrideBlinds()
+{
+    if (isBright())
+    {
+        continuousOverrideState = OVERRIDE_LIGHT;
+    }
+    else
+    {
+        continuousOverrideState = OVERRIDE_DARK;
+    }
+    forceToggleBlinds();
+}
+
+void timerOverrideBlinds()
+{
+    lastOverrideMillis = millis();
+    forceToggleBlinds();
+}
+
+void checkSerialInputs()
+{
+    char input = Serial.read();
+    if (input == 'o')
+    {
+        if (isTimerOn)
+        {
+            timerOverrideBlinds();
+        }
+        else
+        {
+            continuousOverrideBlinds();
+        }
     }
 }
