@@ -18,29 +18,30 @@ long getRainbowColor(int i, int size);
 
 void calibrate()
 {
+    static struct BlindsState *state = getBlindsState();
     if (CircuitPlayground.slideSwitch()) //slide switch left
     {
         if (isLongPressLeft())
         {
-            calibrateDarkThreshold(getBlindsState());
-            (*getBlindsState()).isContinuousOverrideOn = false;
+            calibrateDarkThreshold(state);
+            (*state).isContinuousOverrideOn = false;
         }
         if (isLongPressRight())
         {
-            calibrateLightThreshold(getBlindsState());
-            (*getBlindsState()).isContinuousOverrideOn = false;
+            calibrateLightThreshold(state);
+            (*state).isContinuousOverrideOn = false;
         }
     }
     else
     {
         if (isLongPressLeft())
         {
-            (*getBlindsState()).isTimerOn = !(*getBlindsState()).isTimerOn;
+            (*state).isTimerOn = !(*state).isTimerOn;
             Serial.print("Timer mode set to: ");
-            Serial.println((*getBlindsState()).isTimerOn);
-            if ((*getBlindsState()).isTimerOn)
+            Serial.println((*state).isTimerOn);
+            if ((*state).isTimerOn)
             {
-                (*getBlindsState()).isContinuousOverrideOn = false;
+                (*state).isContinuousOverrideOn = false;
                 //indicate timer mode with rainbow colors
                 const int size = 10;
                 for (int neoIndex = 0; neoIndex < size; neoIndex++)
@@ -51,7 +52,7 @@ void calibrate()
             }
             else
             {
-                (*getBlindsState()).timerMillis = 0;
+                (*state).timerMillis = 0;
                 //indicate continuous override mode with all white LEDs
                 const int size = 10;
                 for (int neoIndex = 0; neoIndex < size; neoIndex++)
@@ -63,10 +64,10 @@ void calibrate()
         }
         if (isLongPressRight())
         {
-            if ((*getBlindsState()).isTimerOn)
+            if ((*state).isTimerOn)
             {
-                resetManualOverrideTimer(getBlindsState());
-                calibrateManualOverrideTimer(getBlindsState(), isLongPressRight);
+                resetManualOverrideTimer(state);
+                calibrateManualOverrideTimer(state, isLongPressRight);
             }
             else //do not allow timer calibration if timer is off
             {
