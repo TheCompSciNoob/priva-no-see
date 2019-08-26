@@ -16,12 +16,8 @@ struct BlindsState
     int darkThreshold;
 };
 
-void setupBlinds();
+void operateBlinds(struct BlindsState *state);
 
-void operateBlinds();
-
-void overrideBlinds();
-
-struct BlindsState *getBlindsState();
+void overrideBlinds(struct BlindsState *state);
 
 #endif

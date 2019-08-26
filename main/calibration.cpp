@@ -16,9 +16,8 @@ void resetManualOverrideTimer(struct BlindsState *state);
 void calibrateManualOverrideTimer(struct BlindsState *state, bool isLongPress(void));
 long getRainbowColor(int i, int size);
 
-void calibrate()
+void calibrate(struct BlindsState *state)
 {
-    static struct BlindsState *state = getBlindsState();
     if (CircuitPlayground.slideSwitch()) //slide switch left
     {
         if (isLongPressLeft())

@@ -1,116 +1,100 @@
 #include <Adafruit_CircuitPlayground.h>
 #include "blinds.h"
 
-void setupBlinds();
-void operateBlinds();
-void operateTimerMode();
-void operateContinuousOverrideMode();
-void defaultOperateBlinds();
-void forceToggleBlinds();
-void openBlinds();
-void closeBlinds();
-void continuousOverrideBlinds();
-void timerOverrideBlinds();
-void overrideBlinds();
-bool isBright();
+void operateBlinds(struct BlindsState *state);
+void operateTimerMode(struct BlindsState *state);
+void operateContinuousOverrideMode(struct BlindsState *state);
+void defaultOperateBlinds(struct BlindsState *state);
+void forceToggleBlinds(struct BlindsState *state);
+void openBlinds(struct BlindsState *state);
+void closeBlinds(struct BlindsState *state);
+void continuousOverrideBlinds(struct BlindsState *state);
+void timerOverrideBlinds(struct BlindsState *state);
+void overrideBlinds(struct BlindsState *state);
+bool isBright(struct BlindsState *state);
 
-struct BlindsState state = {
-    .isTimerOn = false,
-    .lastOverrideMillis = 0L,
-    .timerMillis = 0L,
-    .isContinuousOverrideOn = false,
-    .lastLightState = true,
-    .isClosed = false,
-    .lightThreshold = MAX_BRIGHT,
-    .darkThreshold = MIN_BRIGHT};
-
-struct BlindsState *getBlindsState()
+void operateBlinds(struct BlindsState *state)
 {
-    return &state;
-}
-
-void operateBlinds()
-{
-    if (state.isTimerOn)
-        operateTimerMode();
+    if ((*state).isTimerOn)
+        operateTimerMode(state);
     else
-        operateContinuousOverrideMode();
+        operateContinuousOverrideMode(state);
 }
 
-void operateTimerMode()
+void operateTimerMode(struct BlindsState *state)
 {
-    if (millis() - state.lastOverrideMillis > state.timerMillis)
-        defaultOperateBlinds(); //stop override when time is up
+    if (millis() - (*state).lastOverrideMillis > (*state).timerMillis)
+        defaultOperateBlinds(state); //stop override when time is up
 }
 
-void operateContinuousOverrideMode()
+void operateContinuousOverrideMode(struct BlindsState *state)
 {
-    if (state.lastLightState != isBright()) //change in light state
+    if ((*state).lastLightState != isBright(state)) //change in light state
     {
-        state.lastLightState = !state.lastLightState;
-        state.isContinuousOverrideOn = false;
+        (*state).lastLightState = !(*state).lastLightState;
+        (*state).isContinuousOverrideOn = false;
     }
-    if (!state.isContinuousOverrideOn)
+    if (!(*state).isContinuousOverrideOn)
     {
-        defaultOperateBlinds();
+        defaultOperateBlinds(state);
     }
 }
 
-void defaultOperateBlinds()
+void defaultOperateBlinds(struct BlindsState *state)
 {
-    if (isBright())
-        openBlinds();
+    if (isBright(state))
+        openBlinds(state);
     else
-        closeBlinds();
+        closeBlinds(state);
 }
 
-void forceToggleBlinds()
+void forceToggleBlinds(struct BlindsState *state)
 {
-    if (state.isClosed)
-        openBlinds();
+    if ((*state).isClosed)
+        openBlinds(state);
     else
-        closeBlinds();
+        closeBlinds(state);
 }
 
-void openBlinds()
+void openBlinds(struct BlindsState *state)
 {
     CircuitPlayground.redLED(true);
-    if (!state.isClosed)
+    if (!(*state).isClosed)
         return;
-    state.isClosed = false;
+    (*state).isClosed = false;
     //TODO
 }
 
-void closeBlinds()
+void closeBlinds(struct BlindsState *state)
 {
     CircuitPlayground.redLED(false);
-    if (state.isClosed)
+    if ((*state).isClosed)
         return;
-    state.isClosed = true;
+    (*state).isClosed = true;
     //TODO
 }
 
-void continuousOverrideBlinds()
+void continuousOverrideBlinds(struct BlindsState *state)
 {
-    state.isContinuousOverrideOn = true;
-    forceToggleBlinds();
+    (*state).isContinuousOverrideOn = true;
+    forceToggleBlinds(state);
 }
 
-void timerOverrideBlinds()
+void timerOverrideBlinds(struct BlindsState *state)
 {
-    state.lastOverrideMillis = millis();
-    forceToggleBlinds();
+    (*state).lastOverrideMillis = millis();
+    forceToggleBlinds(state);
 }
 
-void overrideBlinds()
+void overrideBlinds(struct BlindsState *state)
 {
-    if (state.isTimerOn)
-        timerOverrideBlinds();
+    if ((*state).isTimerOn)
+        timerOverrideBlinds(state);
     else
-        continuousOverrideBlinds();
+        continuousOverrideBlinds(state);
 }
 
-bool isBright()
+bool isBright(struct BlindsState *state)
 {
-    return CircuitPlayground.lightSensor() > (state.lightThreshold + state.darkThreshold) / 2;
+    return CircuitPlayground.lightSensor() > ((*state).lightThreshold + (*state).darkThreshold) / 2;
 }

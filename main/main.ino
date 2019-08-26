@@ -10,22 +10,36 @@ void setup()
 
 void loop()
 {
+    //log light sensor
     Serial.print("Brightness: "); //log sensor
     Serial.println(CircuitPlayground.lightSensor());
 
-    operateBlinds();
+    //create blinds state
+    static struct BlindsState state = {
+        .isTimerOn = false,
+        .lastOverrideMillis = 0L,
+        .timerMillis = 0L,
+        .isContinuousOverrideOn = false,
+        .lastLightState = true,
+        .isClosed = false,
+        .lightThreshold = MAX_BRIGHT,
+        .darkThreshold = MIN_BRIGHT};
 
-    calibrate();
+    //calibrates blinds state properties
+    calibrate(&state);
 
-    checkSerialInputs();
+    //controller
+    operateBlinds(&state);
+
+    checkSerialInputs(&state);
 
     //run every second
     delay(1000);
 }
 
-void checkSerialInputs()
+void checkSerialInputs(struct BlindsState *state)
 {
     char input = Serial.read();
     if (input == 'o')
-        overrideBlinds();
+        overrideBlinds(state);
 }
