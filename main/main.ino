@@ -1,6 +1,7 @@
 #include <Adafruit_CircuitPlayground.h>
 #include "calibration.h"
 #include "blinds.h"
+#include "motor.h"
 
 #define MOTOR_CW A10
 #define MOTOR_CCW A9
@@ -31,11 +32,11 @@ void loop()
         .isClosed = false,
         .lightThreshold = MAX_BRIGHT,
         .darkThreshold = MIN_BRIGHT,
-        .openCallback = []() { //TODO: motor stuff
-            Serial.println("Open blinds callback.");
+        .openCallback = []() {
+            motorOpenBlinds(MOTOR_CW, MOTOR_CCW);
         },
-        .closeCallback = []() { //TODO: motor stuff
-            Serial.println("Close blinds callback.");
+        .closeCallback = []() {
+            motorCloseBlinds(MOTOR_CW, MOTOR_CCW);
         }};
 
     //calibrates blinds state properties
