@@ -68,7 +68,7 @@ void openBlinds(struct BlindsState *state)
     if (!(*state).isClosed)
         return;
     (*state).isClosed = false;
-    //TODO
+    (*state).openCallback();
 }
 
 void closeBlinds(struct BlindsState *state)
@@ -77,7 +77,7 @@ void closeBlinds(struct BlindsState *state)
     if ((*state).isClosed)
         return;
     (*state).isClosed = true;
-    //TODO
+    (*state).closeCallback();
 }
 
 //override blinds in continuous override mode

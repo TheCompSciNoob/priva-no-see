@@ -8,14 +8,14 @@
 
 bool isLongPressLeft();
 bool isLongPressRight();
-void blinkNeos(int neos[], int times, int size, int hex);
+void blinkNeos(int neos[], int times, int size, long hex);
 void blinkRainbow(int times);
 void startTimerMode(struct BlindsState *state);
 void startContinuousOverrideMode(struct BlindsState *state);
 void calibrateDarkThreshold(struct BlindsState *state);
 void calibrateLightThreshold(struct BlindsState *state);
 void resetManualOverrideTimer(struct BlindsState *state);
-void calibrateManualOverrideTimer(struct BlindsState *state, bool isLongPress(void));
+void calibrateManualOverrideTimer(struct BlindsState *state, bool isLongPress());
 long getRainbowColor(int i, int size);
 
 //checks slide switch and button inputs for calibration
@@ -141,7 +141,7 @@ void resetManualOverrideTimer(struct BlindsState *state)
 }
 
 //calibrate timer with button input
-void calibrateManualOverrideTimer(struct BlindsState *state, bool isLongPress(void))
+void calibrateManualOverrideTimer(struct BlindsState *state, bool isLongPress())
 {
     Serial.println("Calibrating manual override timer...");
     const int size = 10;
@@ -162,7 +162,7 @@ void calibrateManualOverrideTimer(struct BlindsState *state, bool isLongPress(vo
     Serial.println(" minutes.");
 }
 
-void blinkNeos(int neos[], int times, int size, int hex)
+void blinkNeos(int neos[], int times, int size, long hex)
 {
     for (int timesBlinked = 0; timesBlinked < times; timesBlinked++)
     {
