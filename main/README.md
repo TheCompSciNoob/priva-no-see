@@ -9,5 +9,5 @@ Long press left/right buttons to calibrate brightness and manual override time.
     * Left button: calibrate light level when it is dark.
     * Right button: calibrate light level when there is light.
 * Slide Switch Right: Calibrate manual override time
-    * Left button: Reset manual override time.
-    * Right button: Hold down to increment the length of a manual override. A minute is incremented every time an LED lights up.
+    * Left button: Switch between timer mode and continuous mode. Rainbow colored LEDs represent timer mode, and white LEDs represent continuous mode.
+    * Right button: Only works in timer mode. Hold down to increment the length of a manual override. A minute is incremented every time an LED lights up.
