@@ -17,17 +17,6 @@ void setup()
 
 void loop()
 {
-    //spin CW for 5 seconds
-    digitalWrite(MOTOR_CW, HIGH);
-    digitalWrite(MOTOR_CCW, LOW);
-    delay(5000);
-    //spin CCW for 5 seconds
-    digitalWrite(MOTOR_CCW, HIGH);
-    digitalWrite(MOTOR_CW, LOW);
-    delay(5000);
-    //reset
-    digitalWrite(MOTOR_CCW, LOW);
-
     //log light sensor
     Serial.print("Brightness: "); //log sensor
     Serial.println(CircuitPlayground.lightSensor());
