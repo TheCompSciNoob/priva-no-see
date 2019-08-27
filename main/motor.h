@@ -1,8 +1,17 @@
 #ifndef MOTOR_H
 #define MOTOR_H
 
-void motorOpenBlinds();
+struct Motor
+{
+    int pinCw1;
+    int pinCw2;
+    int pinCcw1;
+    int pinCcw2;
+};
 
-void motorCloseBlinds();
+void
+motorOpenBlinds(struct Motor motor);
+
+void motorCloseBlinds(struct Motor motor);
 
 #endif
