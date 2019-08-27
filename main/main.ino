@@ -41,7 +41,13 @@ void loop()
         .lastLightState = true,
         .isClosed = false,
         .lightThreshold = MAX_BRIGHT,
-        .darkThreshold = MIN_BRIGHT};
+        .darkThreshold = MIN_BRIGHT,
+        .openCallback = []() { //TODO: motor stuff
+            Serial.println("Open blinds callback.");
+        },
+        .closeCallback = []() { //TODO: motor stuff
+            Serial.println("Close blinds callback.");
+        }};
 
     //calibrates blinds state properties
     calibrate(&state);

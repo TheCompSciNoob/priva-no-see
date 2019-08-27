@@ -17,6 +17,9 @@ struct BlindsState
     bool isClosed;
     int lightThreshold;
     int darkThreshold;
+    //callbacks
+    void (*openCallback) ();
+    void (*closeCallback) ();
 };
 
 void operateBlinds(struct BlindsState *state);
