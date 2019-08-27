@@ -2,14 +2,32 @@
 #include "calibration.h"
 #include "blinds.h"
 
+#define MOTOR_CW A10
+#define MOTOR_CCW A9
+
 void setup()
 {
     CircuitPlayground.begin();
     Serial.begin(9600);
+
+    //set up motor pins
+    pinMode(MOTOR_CW, OUTPUT);
+    pinMode(MOTOR_CCW, OUTPUT);
 }
 
 void loop()
 {
+    //spin CW for 5 seconds
+    digitalWrite(MOTOR_CW, HIGH);
+    digitalWrite(MOTOR_CCW, LOW);
+    delay(5000);
+    //spin CCW for 5 seconds
+    digitalWrite(MOTOR_CCW, HIGH);
+    digitalWrite(MOTOR_CW, LOW);
+    delay(5000);
+    //reset
+    digitalWrite(MOTOR_CCW, LOW);
+
     //log light sensor
     Serial.print("Brightness: "); //log sensor
     Serial.println(CircuitPlayground.lightSensor());
