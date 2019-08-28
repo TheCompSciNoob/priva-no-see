@@ -3,8 +3,10 @@
 
 struct ClapSensor
 {
-    int soundLevel;
-    int timeMillis;
+    long sensorMillis;
+    long detectMillisStart;
+    long detectMillisEnd;
+    float loudDifference;
     void (*sensorCallback)();
 };
 
