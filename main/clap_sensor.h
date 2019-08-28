@@ -8,6 +8,8 @@ struct ClapSensor
     void (*sensorCallback)();
 };
 
-void runClapSensor(ClapSensor sensor);
+void setupClapSensor(struct ClapSensor sensor, long allowSetupMillis);
+
+void runClapSensor(struct ClapSensor sensor);
 
 #endif

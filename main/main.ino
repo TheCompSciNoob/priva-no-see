@@ -31,7 +31,7 @@ static struct BlindsState state = {
 
 //clap sensor info
 static struct ClapSensor clapSensor = {
-    .soundLevel = 90,
+    .soundLevel = 100, //temporary
     .timeMillis = 10,
     .sensorCallback = []() { overrideBlinds(&state); }};
 
@@ -45,6 +45,9 @@ void setup()
     pinMode(MOTOR_CW2, OUTPUT);
     pinMode(MOTOR_CCW1, OUTPUT);
     pinMode(MOTOR_CCW2, OUTPUT);
+
+    //set up clap sensor (per-record sounds)
+    setupClapSensor(clapSensor, 10000); //10 seconds
 }
 
 void loop()

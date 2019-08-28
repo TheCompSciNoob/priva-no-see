@@ -4,6 +4,8 @@
 
 #define MILLIS_PER_MIN 60000L
 #define WHITE_HEX 0xffffff
+#define BLUE_HEX 0x0000ff
+#define YELLOW_HEX 0xffff00
 #define BLINK_DELAY 150
 
 bool isLongPressLeft();
@@ -118,7 +120,7 @@ void calibrateDarkThreshold(struct BlindsState *state)
     Serial.println((*state).darkThreshold);
     const int size = 5;
     int neos[] = {0, 1, 2, 3, 4};
-    blinkNeos(neos, 3, size, WHITE_HEX);
+    blinkNeos(neos, 3, size, BLUE_HEX);
 }
 
 //sets lightThreshold in BlindsState with button input
@@ -129,7 +131,7 @@ void calibrateLightThreshold(struct BlindsState *state)
     Serial.println((*state).lightThreshold);
     const int size = 5;
     int neos[] = {5, 6, 7, 8, 9};
-    blinkNeos(neos, 3, size, WHITE_HEX);
+    blinkNeos(neos, 3, size, YELLOW_HEX);
 }
 
 //resets timer to 0
