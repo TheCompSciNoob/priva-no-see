@@ -4,8 +4,8 @@
 struct ClapSensor
 {
     int soundLevel;
-    int soundPressureLevel;
-    void (*sensorCallback) ();
+    int timeMillis;
+    void (*sensorCallback)();
 };
 
 void runClapSensor(ClapSensor sensor);

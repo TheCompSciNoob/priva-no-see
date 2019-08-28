@@ -3,7 +3,7 @@
 
 void runClapSensor(struct ClapSensor sensor)
 {
-    float value = CircuitPlayground.mic.soundPressureLevel(sensor.soundPressureLevel);
+    float value = CircuitPlayground.mic.soundPressureLevel(sensor.timeMillis);
 
     Serial.print("Sound Sensor SPL: ");
     Serial.println(value);
