@@ -17,6 +17,7 @@ void clapSensor()
 {
   float value = CircuitPlayground.mic.soundPressureLevel(10);
   
+
   Serial.print("Sound Sensor SPL: ");
   Serial.println(value);
   
@@ -27,6 +28,7 @@ void clapSensor()
        delay(50);
        CircuitPlayground.redLED(LOW);
        delay(50);
+      // x++;
   }
   
 
