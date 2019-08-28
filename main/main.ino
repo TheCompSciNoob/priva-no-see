@@ -40,7 +40,7 @@ void loop()
         .timerMillis = 0L,
         .isContinuousOverrideOn = false,
         .lastLightState = true,
-        .isClosed = false,
+        .isClosed = true,
         .lightThreshold = MAX_BRIGHT,
         .darkThreshold = MIN_BRIGHT,
         .openCallback = []() { motorOpenBlinds(motor); },
