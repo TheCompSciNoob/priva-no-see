@@ -32,7 +32,7 @@ static struct BlindsState state = {
 //clap sensor info
 static struct ClapSensor clapSensor = {
     .soundLevel = 90,
-    .timerMillis = 10,
+    .timeMillis = 10,
     .sensorCallback = []() { overrideBlinds(&state); }};
 
 void setup()
