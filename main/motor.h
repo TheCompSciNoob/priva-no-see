@@ -3,14 +3,14 @@
 
 struct Motor
 {
-    int pinCw1;
-    int pinCw2;
-    int pinCcw1;
-    int pinCcw2;
+    int dataPin;  //DS
+    int clockPin; //SH_CP
+    int latchPin; //ST_CP
+    int stepsCw;
+    int stepsCcw;
 };
 
-void
-motorOpenBlinds(struct Motor motor);
+void motorOpenBlinds(struct Motor motor);
 
 void motorCloseBlinds(struct Motor motor);
 

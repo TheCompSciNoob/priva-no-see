@@ -11,10 +11,11 @@
 
 //motor info
 static struct Motor motor = {
-    .pinCw1 = MOTOR_CW1,
-    .pinCw2 = MOTOR_CW2,
-    .pinCcw1 = MOTOR_CCW1,
-    .pinCcw2 = MOTOR_CCW2};
+    .dataPin = A7,
+    .clockPin = A9,
+    .latchPin = A10,
+    .stepsCw = 1024,
+    .stepsCcw = 1024};
 
 //create blinds state
 static struct BlindsState state = {
