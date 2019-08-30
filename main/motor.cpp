@@ -39,7 +39,7 @@ void stepperShift(struct Motor motor, int offset)
     }
 
     //signal stepper motor
-    digitalWrite(motor.latchPin, HIGH);
-    shiftOut(motor.dataPin, motor.clockPin, MSBFIRST, stepperSteps[stepperIndex]);
     digitalWrite(motor.latchPin, LOW);
+    shiftOut(motor.dataPin, motor.clockPin, MSBFIRST, stepperSteps[stepperIndex]);
+    digitalWrite(motor.latchPin, HIGH);
 }
