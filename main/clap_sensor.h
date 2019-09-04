@@ -6,12 +6,12 @@ struct ClapSensor
     long sensorMillis;
     long detectMillisStart;
     long detectMillisEnd;
-    float loudDifference;
+    float minimumLevel;
     void (*sensorCallback)();
 };
 
-void setupClapSensor(struct ClapSensor sensor, long allowSetupMillis);
+void setupClapSensor(struct ClapSensor *sensor, long allowSetupMillis);
 
-void runClapSensor(struct ClapSensor sensor);
+void runClapSensor(struct ClapSensor *sensor);
 
 #endif

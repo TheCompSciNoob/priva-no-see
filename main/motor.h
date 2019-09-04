@@ -3,15 +3,19 @@
 
 struct Motor
 {
-    int dataPin;  //DS
-    int clockPin; //SH_CP
-    int latchPin; //ST_CP
+    int pin1;
+    int pin2;
+    int pin3;
+    int pin4;
+    long delay;
     int stepsCw;
     int stepsCcw;
 };
 
-void motorOpenBlinds(struct Motor motor);
+void setupMotor(struct Motor *motor);
 
-void motorCloseBlinds(struct Motor motor);
+void motorOpenBlinds(struct Motor *motor);
+
+void motorCloseBlinds(struct Motor *motor);
 
 #endif

@@ -3,19 +3,20 @@
 #include <limits.h>
 #include "clap_sensor.h"
 
+#define MAX_SOUND 100
 #define N_SAMPLES 50
 #define MIN_INTERVAL 50 //minimum interval between collecting samples is 50 milliseconds
 #define GREEN_HEX 0x00ff00
 
-void setupClapSensor(struct ClapSensor sensor, long allowSetupMillis);
-void runClapSensor(struct ClapSensor sensor);
+void setupClapSensor(struct ClapSensor *sensor, long allowSetupMillis);
+void runClapSensor(struct ClapSensor *sensor);
 float averageSoundLevel();
 
 static int sampleCount = 0;
 static float soundLevels[N_SAMPLES];
 static long lastLoudSound = LONG_MAX;
 
-void setupClapSensor(struct ClapSensor sensor, long allowSetupMillis)
+void setupClapSensor(struct ClapSensor *sensor, long allowSetupMillis)
 {
     long intervalMillis = (long)fmax(MIN_INTERVAL, allowSetupMillis / N_SAMPLES);
     long nInitialSamples = allowSetupMillis / intervalMillis;
@@ -27,29 +28,30 @@ void setupClapSensor(struct ClapSensor sensor, long allowSetupMillis)
         int progressNeo = (int)(neosSize * sampleCount / nInitialSamples);
         CircuitPlayground.setPixelColor(progressNeo, GREEN_HEX);
         //add sample to array
-        float soundLevel = CircuitPlayground.mic.soundPressureLevel(sensor.sensorMillis);
+        float soundLevel = CircuitPlayground.mic.soundPressureLevel(sensor->sensorMillis);
         soundLevels[sampleCount] = soundLevel;
         delay(intervalMillis);
     }
     CircuitPlayground.clearPixels();
 }
 
-void runClapSensor(struct ClapSensor sensor)
+void runClapSensor(struct ClapSensor *sensor)
 {
-    float soundLevel = CircuitPlayground.mic.soundPressureLevel(sensor.sensorMillis);
+    float soundLevel = CircuitPlayground.mic.soundPressureLevel(sensor->sensorMillis);
     //log for debugging
     Serial.print("Sound Level: ");
     Serial.println(soundLevel);
-    if (soundLevel > averageSoundLevel() + sensor.loudDifference)
+    bool isLoud = soundLevel > fmax((averageSoundLevel() + MAX_SOUND) / 2, sensor->minimumLevel);
+    if (isLoud)
     {
         long currentMillis = millis();
         long interval = currentMillis - lastLoudSound;
         lastLoudSound = currentMillis;
-        if (interval >= sensor.detectMillisStart && interval <= sensor.detectMillisEnd)
+        if (interval >= sensor->detectMillisStart && interval <= sensor->detectMillisEnd)
         {
             //classify as clap.
             Serial.println("Clap detected.");
-            sensor.sensorCallback();
+            sensor->sensorCallback();
         }
     }
 

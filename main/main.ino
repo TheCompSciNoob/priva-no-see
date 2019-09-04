@@ -4,53 +4,16 @@
 #include "motor.h"
 #include "clap_sensor.h"
 
-#define MOTOR_CW1 A10
-#define MOTOR_CW2 A9
-#define MOTOR_CCW1 A7
-#define MOTOR_CCW2 A11
-
-//motor info
-static struct Motor motor = {
-    .dataPin = A7,
-    .clockPin = A9,
-    .latchPin = A10,
-    .stepsCw = 1024,
-    .stepsCcw = 1024};
-
-//create blinds state
-static struct BlindsState state = {
-    .isTimerOn = false,
-    .lastOverrideMillis = 0L,
-    .timerMillis = 0L,
-    .isContinuousOverrideOn = false,
-    .lastLightState = true,
-    .isClosed = true,
-    .lightThreshold = MAX_BRIGHT,
-    .darkThreshold = MIN_BRIGHT,
-    .openCallback = []() { motorOpenBlinds(motor); },
-    .closeCallback = []() { motorCloseBlinds(motor); }};
-
-//clap sensor info
-static struct ClapSensor clapSensor = {
-    .sensorMillis = 10,
-    .detectMillisStart = 200,
-    .detectMillisEnd = 500,
-    .loudDifference = 15,
-    .sensorCallback = []() { overrideBlinds(&state); }};
-
 void setup()
 {
     CircuitPlayground.begin();
     Serial.begin(9600);
 
-    //set up motor pins
-    pinMode(MOTOR_CW1, OUTPUT);
-    pinMode(MOTOR_CW2, OUTPUT);
-    pinMode(MOTOR_CCW1, OUTPUT);
-    pinMode(MOTOR_CCW2, OUTPUT);
+    //set up motor (pins)
+    setupMotor(getMotorInfo());
 
     //set up clap sensor (per-record sounds)
-    setupClapSensor(clapSensor, 10000); //10 seconds
+    setupClapSensor(getClapSensorInfo(), 10000); //10 seconds
 }
 
 void loop()
@@ -60,19 +23,59 @@ void loop()
     Serial.println(CircuitPlayground.lightSensor());
 
     //calibrates blinds state properties
-    calibrate(&state);
+    calibrate(getBlindsState());
 
     //controller
-    operateBlinds(&state);
+    operateBlinds(getBlindsState());
 
     //detect claps
-    runClapSensor(clapSensor);
+    runClapSensor(getClapSensorInfo());
 
     //check computer inputs for debugging
-    processSerialInputs(&state);
+    processSerialInputs(getBlindsState());
 
-    //run every 50 milliseconds
-    delay(50);
+    //run every 30 milliseconds
+    delay(30);
+}
+
+struct BlindsState *getBlindsState()
+{
+    static struct BlindsState state = {
+        .isTimerOn = false,
+        .lastOverrideMillis = 0L,
+        .timerMillis = 0L,
+        .isContinuousOverrideOn = false,
+        .lastLightState = true,
+        .isClosed = true,
+        .lightThreshold = MAX_BRIGHT,
+        .darkThreshold = MIN_BRIGHT,
+        .openCallback = []() { motorOpenBlinds(getMotorInfo()); },
+        .closeCallback = []() { motorCloseBlinds(getMotorInfo()); }};
+    return &state;
+}
+
+struct Motor *getMotorInfo()
+{
+    static struct Motor motor = {
+        .pin1 = A11,
+        .pin2 = A7,
+        .pin3 = A9,
+        .pin4 = A10,
+        .delay = 1,
+        .stepsCw = 200000, //open
+        .stepsCcw = 200000}; //close
+    return &motor;
+}
+
+struct ClapSensor *getClapSensorInfo()
+{
+    static struct ClapSensor clapSensor = {
+        .sensorMillis = 10,
+        .detectMillisStart = 200,
+        .detectMillisEnd = 500,
+        .minimumLevel = 75.0,
+        .sensorCallback = []() { overrideBlinds(getBlindsState()); }};
+    return &clapSensor;
 }
 
 //send inputs from computer
